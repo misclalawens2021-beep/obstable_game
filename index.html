@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu de Plateforme</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <div id="ui">
+    <div class="grp"><div>Niveau : <span id="level">1</span></div><div>Score : <span id="score">0</span></div></div>
+    <div class="grp"><div id="lives">&#9829;&#9829;&#9829;</div><div>Meilleur : <span id="best">0</span></div></div>
+  </div>
+  <canvas id="game" width="800" height="450"></canvas>
+  <div id="info">
+    <button class="btn" id="restart">Recommencer</button>
+    &nbsp; &larr; &rarr; : se déplacer &nbsp;|&nbsp; Espace / &uarr; : sauter &nbsp;|&nbsp; P : pause
+  </div>
+
+<script src="/assets/script.js"></script>
+</body>
+</html>
