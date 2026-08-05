@@ -6,222 +6,213 @@
 <title>Jeu de Plateforme</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
+  body {
     background: #1a1a2e;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
     font-family: Arial, sans-serif;
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
-    position: fixed;
+    overflow: hidden;
+    padding: 10px;
   }
-  
-  /* Conteneur principal - plein écran */
-  #game-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-    height: 100vh;
-    background: #16213e;
-    padding: 5px;
-    gap: 4px;
-  }
-  
   #ui {
     color: #fff;
-    font-size: clamp(12px, 2vh, 18px);
+    font-size: 16px;
+    margin-bottom: 8px;
+    width: 100%;
+    max-width: 800px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2px 8px;
-    flex-shrink: 0;
-    height: clamp(30px, 5vh, 50px);
-    background: rgba(0,0,0,0.3);
-    border-radius: 8px;
+    padding: 0 5px;
   }
-  #ui .grp { display: flex; align-items: center; gap: clamp(8px, 1.5vw, 18px); flex-wrap: wrap; }
+  #ui .grp { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   #ui span { font-weight: bold; }
   #lives { 
     color: #ff5252; 
     letter-spacing: 1px; 
-    font-size: clamp(14px, 2vh, 20px);
-    min-width: clamp(80px, 12vw, 150px);
-  }
-  
-  /* Canvas - prend tout l'espace disponible */
-  #game-container {
-    flex: 1;
-    position: relative;
-    min-height: 0;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #16213e;
+    font-size: 18px;
+    min-width: 120px;
   }
   canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    touch-action: none;
+    border: 2px solid #e94560;
+    border-radius: 8px;
     background: #16213e;
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    touch-action: none;
+    display: block;
   }
-  
-  /* Contrôles tactiles - en bas */
   #controls {
+    width: 100%;
+    max-width: 800px;
     display: none; /* Caché par défaut (mode PC) */
     justify-content: space-between;
     align-items: center;
-    padding: clamp(4px, 1vh, 10px) clamp(8px, 2vw, 20px);
-    gap: clamp(8px, 2vw, 20px);
-    flex-shrink: 0;
-    height: clamp(70px, 12vh, 120px);
+    padding: 10px 5px;
+    gap: 10px;
+    margin-top: 5px;
     touch-action: none;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
   }
-  
-  /* Affichage des contrôles tactiles sur mobile */
+  /* Affichage des contrôles tactiles UNIQUEMENT sur mobile */
   @media (pointer: coarse) {
-    #controls { display: flex !important; }
+    #controls {
+      display: flex !important;
+    }
   }
+  /* Ou si l'écran est petit */
   @media (max-width: 768px) {
-    #controls { display: flex !important; }
+    #controls {
+      display: flex !important;
+    }
   }
-  
   .ctrl-btn {
     background: rgba(233, 69, 96, 0.6);
     color: #fff;
     border: 2px solid #e94560;
     border-radius: 50%;
-    width: clamp(50px, 8vh, 80px);
-    height: clamp(50px, 8vh, 80px);
-    font-size: clamp(20px, 3.5vh, 35px);
+    width: 70px;
+    height: 70px;
+    font-size: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     touch-action: none;
     cursor: pointer;
-    transition: all 0.1s;
+    transition: background 0.1s;
     -webkit-tap-highlight-color: transparent;
-    flex-shrink: 0;
   }
   .ctrl-btn:active, .ctrl-btn.active {
     background: rgba(233, 69, 96, 0.9);
-    transform: scale(0.92);
+    transform: scale(0.95);
   }
   .ctrl-btn.jump {
     background: rgba(255, 215, 0, 0.6);
     border-color: #ffd700;
-    width: clamp(60px, 10vh, 95px);
-    height: clamp(60px, 10vh, 95px);
-    font-size: clamp(18px, 3vh, 28px);
-    flex-direction: column;
+    width: 85px;
+    height: 85px;
+    font-size: 24px;
   }
   .ctrl-btn.jump:active, .ctrl-btn.jump.active {
     background: rgba(255, 215, 0, 0.9);
   }
   .ctrl-group {
     display: flex;
-    gap: clamp(8px, 1.5vw, 16px);
+    gap: 12px;
     align-items: center;
   }
   .ctrl-btn.small {
-    width: clamp(40px, 6vh, 60px);
-    height: clamp(40px, 6vh, 60px);
-    font-size: clamp(16px, 2.5vh, 26px);
+    width: 55px;
+    height: 55px;
+    font-size: 24px;
   }
-  .jump-label {
-    font-size: clamp(8px, 1.2vh, 12px);
-    display: block;
-  }
-  
-  /* Info - en bas */
-  #info {
-    color: #aaa;
-    font-size: clamp(10px, 1.4vh, 14px);
+  #info { 
+    color: #aaa; 
+    margin-top: 8px; 
+    font-size: 14px; 
     text-align: center;
-    padding: 2px 8px;
-    flex-shrink: 0;
-    height: clamp(25px, 4vh, 40px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
+    padding: 0 10px;
+    width: 100%;
+    max-width: 800px;
   }
   #info .btn {
     background: #e94560;
     color: #fff;
     border: none;
-    padding: clamp(4px, 0.8vh, 8px) clamp(10px, 2vw, 20px);
+    padding: 8px 16px;
     border-radius: 6px;
-    font-size: clamp(11px, 1.4vh, 15px);
+    font-size: 14px;
     cursor: pointer;
     touch-action: manipulation;
   }
   #info .btn:hover { background: #ff6b81; }
   #info .btn:active { transform: scale(0.95); }
   
-  #mobile-controls { display: none; }
-  #desktop-controls { display: inline; }
+  /* Ajustements pour les petits écrans */
+  @media (max-width: 500px) {
+    .ctrl-btn { width: 60px; height: 60px; font-size: 26px; }
+    .ctrl-btn.jump { width: 70px; height: 70px; font-size: 20px; }
+    .ctrl-btn.small { width: 48px; height: 48px; font-size: 20px; }
+    #ui { font-size: 14px; }
+    #lives { font-size: 16px; min-width: 100px; }
+    #info { font-size: 12px; }
+  }
+  
+  @media (max-width: 400px) {
+    .ctrl-btn { width: 50px; height: 50px; font-size: 20px; }
+    .ctrl-btn.jump { width: 60px; height: 60px; font-size: 18px; }
+    .ctrl-btn.small { width: 40px; height: 40px; font-size: 16px; }
+    #ui { font-size: 12px; }
+    #lives { font-size: 14px; min-width: 80px; }
+  }
+  
+  /* Mode paysage sur mobile */
+  @media (orientation: landscape) and (max-height: 500px) {
+    #controls { padding: 5px; }
+    .ctrl-btn { width: 55px; height: 55px; font-size: 24px; }
+    .ctrl-btn.jump { width: 65px; height: 65px; font-size: 20px; }
+    .ctrl-btn.small { width: 45px; height: 45px; font-size: 18px; }
+    #ui { font-size: 14px; }
+    #lives { font-size: 16px; min-width: 100px; }
+  }
+  
+  /* Indicateur de mode */
+  #mode-indicator {
+    color: #666;
+    font-size: 11px;
+    margin-top: 4px;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+  }
+  #mode-indicator span { padding: 2px 10px; border-radius: 4px; }
+  #mode-indicator .pc-mode { background: #2d2d4e; }
+  #mode-indicator .mobile-mode { background: #4e2d3e; display: none; }
   
   @media (pointer: coarse), (max-width: 768px) {
-    #desktop-controls { display: none; }
-    #mobile-controls { display: inline; }
-  }
-  
-  /* Mode paysage sur mobile - boutons plus petits */
-  @media (orientation: landscape) and (max-height: 500px) {
-    #controls { height: clamp(55px, 10vh, 80px); padding: 4px 10px; }
-    .ctrl-btn { width: clamp(40px, 6vh, 55px); height: clamp(40px, 6vh, 55px); font-size: clamp(16px, 2.5vh, 22px); }
-    .ctrl-btn.jump { width: clamp(45px, 7vh, 65px); height: clamp(45px, 7vh, 65px); font-size: clamp(14px, 2vh, 20px); }
-    .ctrl-btn.small { width: clamp(32px, 5vh, 45px); height: clamp(32px, 5vh, 45px); font-size: clamp(14px, 2vh, 18px); }
-    .jump-label { font-size: clamp(6px, 1vh, 10px); }
-    #ui { height: clamp(25px, 4vh, 35px); font-size: clamp(10px, 1.5vh, 14px); }
-    #info { height: clamp(20px, 3vh, 30px); font-size: clamp(8px, 1.2vh, 12px); }
-  }
-  
-  /* Très petits écrans */
-  @media (max-width: 400px) {
-    #controls { height: clamp(60px, 10vh, 80px); }
-    .ctrl-btn { width: clamp(40px, 7vh, 50px); height: clamp(40px, 7vh, 50px); font-size: clamp(16px, 2.5vh, 20px); }
-    .ctrl-btn.jump { width: clamp(48px, 8vh, 60px); height: clamp(48px, 8vh, 60px); font-size: clamp(14px, 2vh, 18px); }
-    .ctrl-btn.small { width: clamp(32px, 5vh, 40px); height: clamp(32px, 5vh, 40px); font-size: clamp(14px, 2vh, 16px); }
+    #mode-indicator .pc-mode { display: none; }
+    #mode-indicator .mobile-mode { display: inline; }
   }
 </style>
 </head>
 <body>
-<div id="game-wrapper">
   <div id="ui">
     <div class="grp"><div>Niveau : <span id="level">1</span></div><div>Score : <span id="score">0</span></div></div>
     <div class="grp"><div id="lives">❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️</div><div>Meilleur : <span id="best">0</span></div></div>
   </div>
+  <canvas id="game" width="800" height="450"></canvas>
   
-  <div id="game-container">
-    <canvas id="game"></canvas>
-  </div>
-  
+  <!-- Contrôles tactiles (visible uniquement sur mobile) -->
   <div id="controls">
     <div class="ctrl-group">
       <button class="ctrl-btn small" id="btn-left">◀</button>
       <button class="ctrl-btn small" id="btn-right">▶</button>
     </div>
     <div class="ctrl-group">
-      <button class="ctrl-btn jump" id="btn-jump">▲<span class="jump-label">SAUTER</span></button>
+      <button class="ctrl-btn jump" id="btn-jump">▲<br><span style="font-size:11px;">SAUTER</span></button>
     </div>
   </div>
   
   <div id="info">
     <button class="btn" id="restart">Recommencer</button>
-    <span id="desktop-controls">&nbsp; &larr; &rarr; : déplacement &nbsp;|&nbsp; Espace / ↑ : sauter &nbsp;|&nbsp; P : pause</span>
-    <span id="mobile-controls">&nbsp; Boutons tactiles &nbsp;|&nbsp; P : pause</span>
+    <span id="desktop-controls">
+      &nbsp; &larr; &rarr; : se déplacer &nbsp;|&nbsp; Espace / &uarr; : sauter &nbsp;|&nbsp; P : pause
+    </span>
+    <span id="mobile-controls" style="display:none;">
+      &nbsp; Boutons tactiles &nbsp;|&nbsp; P : pause
+    </span>
   </div>
-</div>
+  
+  <div id="mode-indicator">
+    <span class="pc-mode">🖥️ Mode PC - Utilisez le clavier</span>
+    <span class="mobile-mode">📱 Mode Mobile - Utilisez les boutons tactiles</span>
+  </div>
 
 <script>
 const canvas = document.getElementById('game');
@@ -231,49 +222,24 @@ const bestEl = document.getElementById('best');
 const levelEl = document.getElementById('level');
 const livesEl = document.getElementById('lives');
 
-// === GESTION DU REDIMENSIONNEMENT PLEIN ÉCRAN ===
-function resizeCanvas() {
-  const container = document.getElementById('game-container');
-  const rect = container.getBoundingClientRect();
-  
-  // On garde le ratio 800/450
-  const ratio = 800 / 450;
-  let width = rect.width;
-  let height = rect.height;
-  
-  if (width / height > ratio) {
-    canvas.width = height * ratio;
-    canvas.height = height;
-  } else {
-    canvas.width = width;
-    canvas.height = width / ratio;
-  }
-  
-  canvas.style.width = '100%';
-  canvas.style.height = '100%';
+// Détection du mode
+const isMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+if (isMobile) {
+  document.getElementById('desktop-controls').style.display = 'none';
+  document.getElementById('mobile-controls').style.display = 'inline';
+} else {
+  document.getElementById('desktop-controls').style.display = 'inline';
+  document.getElementById('mobile-controls').style.display = 'none';
 }
 
-// Redimensionnement initial et au changement
-window.addEventListener('resize', resizeCanvas);
-window.addEventListener('orientationchange', () => {
-  setTimeout(resizeCanvas, 300);
-});
-resizeCanvas();
-
-// === CONSTANTES ===
-const W = () => canvas.width;
-const H = () => canvas.height;
+const W = canvas.width;
+const H = canvas.height;
 const keys = {};
 
 let paused = false;
 let score = 0;
 let best = parseInt(localStorage.getItem('platfBest') || '0');
 bestEl.textContent = best;
-
-// Facteur d'échelle pour que le jeu s'adapte à la taille du canvas
-function scale() {
-  return canvas.width / 800;
-}
 
 const player = {
   x: 50, y: 0, w: 30, h: 40,
@@ -354,9 +320,12 @@ function setupMobileControls() {
   });
 }
 
-setupMobileControls();
+// Ne configurer les contrôles mobiles que si nécessaire
+if (isMobile) {
+  setupMobileControls();
+}
 
-// === FONCTIONS DU JEU (adaptées à la taille du canvas) ===
+// === FONCTIONS DU JEU ===
 
 function setCheckpoint() {
   checkpoint = {
@@ -373,7 +342,7 @@ function respawnAtCheckpoint() {
     player.vx = 0;
     player.vy = 0;
     player.onGround = false;
-    camX = Math.max(0, Math.min(player.x - W() / 2 + player.w / 2, level.width - W()));
+    camX = Math.max(0, Math.min(player.x - W / 2 + player.w / 2, level.width - W));
     showMessage('Retour au checkpoint', false);
   } else {
     respawn();
@@ -389,11 +358,11 @@ function makeLevel(n) {
   };
 
   const platforms = [];
-  let x = 0, y = 450 - 40;
-  platforms.push({ x: 0, y: 450 - 40, w: 180, h: 40 });
+  let x = 0, y = H - 40;
+  platforms.push({ x: 0, y: H - 40, w: 180, h: 40 });
   for (let i = 1; i < p.count; i++) {
     x += p.gap + Math.random() * 60;
-    y = Math.max(450 - 320, y - (p.up + Math.random() * 10));
+    y = Math.max(H - 320, y - (p.up + Math.random() * 10));
     if (i % 3 === 0) y += 80;
     platforms.push({ x: x, y: y, w: p.baseW + Math.random() * 60, h: 30 });
   }
@@ -432,7 +401,7 @@ function makeLevel(n) {
     });
   }
 
-  return { platforms, traps, enemies, coins, finish, spawn: { x: 50, y: 450 - 40 - player.h }, width: finish.x + 100 };
+  return { platforms, traps, enemies, coins, finish, spawn: { x: 50, y: H - 40 - player.h }, width: finish.x + 100 };
 }
 
 function loadLevel(n) {
@@ -504,16 +473,13 @@ function showMessage(txt, big) {
   
   const msg = document.createElement('div');
   msg.dataset.msg = '1';
-  const size = big ? clamp(30, 5, 50) : clamp(20, 3, 35);
-  msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#ffd700;font-size:'+ size +'px;background:rgba(0,0,0,.85);padding:20px 40px;border-radius:10px;z-index:10;text-align:center;pointer-events:none;';
+  msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#ffd700;font-size:'+ (big?40:28) +'px;background:rgba(0,0,0,.85);padding:20px 40px;border-radius:10px;z-index:10;text-align:center;pointer-events:none;';
   msg.textContent = txt;
   document.body.appendChild(msg);
   msg.dataset.auto = '1';
   setTimeout(() => { if (msg.dataset.auto) msg.remove(); }, big ? 2000 : 1600);
   return msg;
 }
-
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
 function rectsCollide(a, b) {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
@@ -528,6 +494,7 @@ function addScore(v) {
 function update() {
   if (paused || !level) return;
 
+  // === GESTION DES TOUCHES (clavier + mobile) ===
   let left = keys['ArrowLeft'] || keys['a'] || mobileKeys.left;
   let right = keys['ArrowRight'] || keys['d'] || mobileKeys.right;
   let jump = keys[' '] || keys['ArrowUp'] || keys['w'] || mobileKeys.jump;
@@ -567,7 +534,7 @@ function update() {
     }
   }
 
-  if (player.y > 450) looseLife();
+  if (player.y > H) looseLife();
 
   for (const e of level.enemies) {
     e.x += e.dir * e.speed;
@@ -594,19 +561,14 @@ function update() {
     setTimeout(() => loadLevel(currentLevel + 1), 1600);
   }
 
-  camX = Math.max(0, Math.min(player.x - W() / 2 + player.w / 2, level.width - W()));
+  camX = Math.max(0, Math.min(player.x - W / 2 + player.w / 2, level.width - W));
 }
 
 function draw() {
-  const w = W();
-  const h = H();
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0, 0, W, H);
   if (!level) return;
 
-  const s = w / 800;
-
   ctx.save();
-  ctx.scale(s, s);
   ctx.translate(-camX, 0);
 
   for (const p of level.platforms) {
@@ -702,7 +664,7 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-// === ÉVÉNEMENTS ===
+// === ÉVÉNEMENTS CLAVIER (toujours actifs) ===
 window.addEventListener('keydown', e => {
   keys[e.key] = true;
   if (e.key === 'p' || e.key === 'P') paused = !paused;
@@ -710,6 +672,7 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => keys[e.key] = false);
 
+// === BOUTON RECOMMENCER ===
 document.getElementById('restart').addEventListener('click', () => {
   lives = maxLives;
   score = 0;
@@ -719,21 +682,33 @@ document.getElementById('restart').addEventListener('click', () => {
   paused = false;
 });
 
+// === EMPÊCHER LE SCROLL SUR LES TOUCHES ===
 document.addEventListener('touchmove', (e) => {
-  if (e.target.closest('#controls, #game-container')) e.preventDefault();
+  if (e.target.closest('#controls, canvas')) e.preventDefault();
 }, { passive: false });
+
+// === DÉTECTION DES CHANGEMENTS D'ORIENTATION ===
+window.addEventListener('resize', () => {
+  const nowMobile = window.innerWidth <= 768;
+  const desktopControls = document.getElementById('desktop-controls');
+  const mobileControls = document.getElementById('mobile-controls');
+  const controls = document.getElementById('controls');
+  
+  if (nowMobile) {
+    desktopControls.style.display = 'none';
+    mobileControls.style.display = 'inline';
+    controls.style.display = 'flex';
+  } else {
+    desktopControls.style.display = 'inline';
+    mobileControls.style.display = 'none';
+    controls.style.display = 'none';
+  }
+});
 
 // === DÉMARRAGE ===
 updateLives();
 loadLevel(1);
 loop();
-
-// Mise à jour du canvas si la fenêtre change
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(resizeCanvas, 100);
-});
 </script>
 </body>
 </html>
