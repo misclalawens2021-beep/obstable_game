@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Jeu de Plateforme</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,35 +14,171 @@
     justify-content: center;
     min-height: 100vh;
     font-family: Arial, sans-serif;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+    padding: 10px;
   }
   #ui {
     color: #fff;
-    font-size: 18px;
-    margin-bottom: 10px;
-    width: 800px;
+    font-size: 16px;
+    margin-bottom: 8px;
+    width: 100%;
+    max-width: 800px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 5px;
   }
-  #ui .grp { display: flex; align-items: center; gap: 18px; }
+  #ui .grp { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   #ui span { font-weight: bold; }
-  #lives { color: #ff5252; letter-spacing: 2px; font-size: 20px; min-width: 200px; }
+  #lives { 
+    color: #ff5252; 
+    letter-spacing: 1px; 
+    font-size: 18px;
+    min-width: 120px;
+  }
   canvas {
     border: 2px solid #e94560;
     border-radius: 8px;
     background: #16213e;
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    touch-action: none;
+    display: block;
   }
-  #info { color: #aaa; margin-top: 10px; font-size: 14px; }
-  .btn {
+  #controls {
+    width: 100%;
+    max-width: 800px;
+    display: none; /* Caché par défaut (mode PC) */
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
+    gap: 10px;
+    margin-top: 5px;
+    touch-action: none;
+  }
+  /* Affichage des contrôles tactiles UNIQUEMENT sur mobile */
+  @media (pointer: coarse) {
+    #controls {
+      display: flex !important;
+    }
+  }
+  /* Ou si l'écran est petit */
+  @media (max-width: 768px) {
+    #controls {
+      display: flex !important;
+    }
+  }
+  .ctrl-btn {
+    background: rgba(233, 69, 96, 0.6);
+    color: #fff;
+    border: 2px solid #e94560;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    cursor: pointer;
+    transition: background 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ctrl-btn:active, .ctrl-btn.active {
+    background: rgba(233, 69, 96, 0.9);
+    transform: scale(0.95);
+  }
+  .ctrl-btn.jump {
+    background: rgba(255, 215, 0, 0.6);
+    border-color: #ffd700;
+    width: 85px;
+    height: 85px;
+    font-size: 24px;
+  }
+  .ctrl-btn.jump:active, .ctrl-btn.jump.active {
+    background: rgba(255, 215, 0, 0.9);
+  }
+  .ctrl-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .ctrl-btn.small {
+    width: 55px;
+    height: 55px;
+    font-size: 24px;
+  }
+  #info { 
+    color: #aaa; 
+    margin-top: 8px; 
+    font-size: 14px; 
+    text-align: center;
+    padding: 0 10px;
+    width: 100%;
+    max-width: 800px;
+  }
+  #info .btn {
     background: #e94560;
     color: #fff;
     border: none;
     padding: 8px 16px;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
+    touch-action: manipulation;
   }
-  .btn:hover { background: #ff6b81; }
+  #info .btn:hover { background: #ff6b81; }
+  #info .btn:active { transform: scale(0.95); }
+  
+  /* Ajustements pour les petits écrans */
+  @media (max-width: 500px) {
+    .ctrl-btn { width: 60px; height: 60px; font-size: 26px; }
+    .ctrl-btn.jump { width: 70px; height: 70px; font-size: 20px; }
+    .ctrl-btn.small { width: 48px; height: 48px; font-size: 20px; }
+    #ui { font-size: 14px; }
+    #lives { font-size: 16px; min-width: 100px; }
+    #info { font-size: 12px; }
+  }
+  
+  @media (max-width: 400px) {
+    .ctrl-btn { width: 50px; height: 50px; font-size: 20px; }
+    .ctrl-btn.jump { width: 60px; height: 60px; font-size: 18px; }
+    .ctrl-btn.small { width: 40px; height: 40px; font-size: 16px; }
+    #ui { font-size: 12px; }
+    #lives { font-size: 14px; min-width: 80px; }
+  }
+  
+  /* Mode paysage sur mobile */
+  @media (orientation: landscape) and (max-height: 500px) {
+    #controls { padding: 5px; }
+    .ctrl-btn { width: 55px; height: 55px; font-size: 24px; }
+    .ctrl-btn.jump { width: 65px; height: 65px; font-size: 20px; }
+    .ctrl-btn.small { width: 45px; height: 45px; font-size: 18px; }
+    #ui { font-size: 14px; }
+    #lives { font-size: 16px; min-width: 100px; }
+  }
+  
+  /* Indicateur de mode */
+  #mode-indicator {
+    color: #666;
+    font-size: 11px;
+    margin-top: 4px;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+  }
+  #mode-indicator span { padding: 2px 10px; border-radius: 4px; }
+  #mode-indicator .pc-mode { background: #2d2d4e; }
+  #mode-indicator .mobile-mode { background: #4e2d3e; display: none; }
+  
+  @media (pointer: coarse), (max-width: 768px) {
+    #mode-indicator .pc-mode { display: none; }
+    #mode-indicator .mobile-mode { display: inline; }
+  }
 </style>
 </head>
 <body>
@@ -51,9 +187,31 @@
     <div class="grp"><div id="lives">❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️</div><div>Meilleur : <span id="best">0</span></div></div>
   </div>
   <canvas id="game" width="800" height="450"></canvas>
+  
+  <!-- Contrôles tactiles (visible uniquement sur mobile) -->
+  <div id="controls">
+    <div class="ctrl-group">
+      <button class="ctrl-btn small" id="btn-left">◀</button>
+      <button class="ctrl-btn small" id="btn-right">▶</button>
+    </div>
+    <div class="ctrl-group">
+      <button class="ctrl-btn jump" id="btn-jump">▲<br><span style="font-size:11px;">SAUTER</span></button>
+    </div>
+  </div>
+  
   <div id="info">
     <button class="btn" id="restart">Recommencer</button>
-    &nbsp; &larr; &rarr; : se déplacer &nbsp;|&nbsp; Espace / &uarr; : sauter &nbsp;|&nbsp; P : pause
+    <span id="desktop-controls">
+      &nbsp; &larr; &rarr; : se déplacer &nbsp;|&nbsp; Espace / &uarr; : sauter &nbsp;|&nbsp; P : pause
+    </span>
+    <span id="mobile-controls" style="display:none;">
+      &nbsp; Boutons tactiles &nbsp;|&nbsp; P : pause
+    </span>
+  </div>
+  
+  <div id="mode-indicator">
+    <span class="pc-mode">🖥️ Mode PC - Utilisez le clavier</span>
+    <span class="mobile-mode">📱 Mode Mobile - Utilisez les boutons tactiles</span>
   </div>
 
 <script>
@@ -63,6 +221,16 @@ const scoreEl = document.getElementById('score');
 const bestEl = document.getElementById('best');
 const levelEl = document.getElementById('level');
 const livesEl = document.getElementById('lives');
+
+// Détection du mode
+const isMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+if (isMobile) {
+  document.getElementById('desktop-controls').style.display = 'none';
+  document.getElementById('mobile-controls').style.display = 'inline';
+} else {
+  document.getElementById('desktop-controls').style.display = 'inline';
+  document.getElementById('mobile-controls').style.display = 'none';
+}
 
 const W = canvas.width;
 const H = canvas.height;
@@ -91,6 +259,73 @@ let finished = false;
 let level = null;
 let camX = 0;
 let checkpoint = null;
+
+// === CONTROLES MOBILES ===
+let mobileKeys = { left: false, right: false, jump: false };
+
+function setupMobileControls() {
+  const btnLeft = document.getElementById('btn-left');
+  const btnRight = document.getElementById('btn-right');
+  const btnJump = document.getElementById('btn-jump');
+
+  function setupButton(btn, keyOn, keyOff) {
+    const start = (e) => {
+      e.preventDefault();
+      btn.classList.add('active');
+      mobileKeys[keyOn] = true;
+      if (keyOff) mobileKeys[keyOff] = false;
+    };
+    const end = (e) => {
+      e.preventDefault();
+      btn.classList.remove('active');
+      mobileKeys[keyOn] = false;
+    };
+    btn.addEventListener('touchstart', start, { passive: false });
+    btn.addEventListener('touchend', end, { passive: false });
+    btn.addEventListener('touchcancel', end, { passive: false });
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('mouseup', end);
+    btn.addEventListener('mouseleave', end);
+  }
+
+  setupButton(btnLeft, 'left', 'right');
+  setupButton(btnRight, 'right', 'left');
+  
+  btnJump.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    btnJump.classList.add('active');
+    mobileKeys.jump = true;
+  }, { passive: false });
+  btnJump.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    btnJump.classList.remove('active');
+    mobileKeys.jump = false;
+  }, { passive: false });
+  btnJump.addEventListener('touchcancel', (e) => {
+    e.preventDefault();
+    btnJump.classList.remove('active');
+    mobileKeys.jump = false;
+  }, { passive: false });
+  btnJump.addEventListener('mousedown', () => {
+    btnJump.classList.add('active');
+    mobileKeys.jump = true;
+  });
+  btnJump.addEventListener('mouseup', () => {
+    btnJump.classList.remove('active');
+    mobileKeys.jump = false;
+  });
+  btnJump.addEventListener('mouseleave', () => {
+    btnJump.classList.remove('active');
+    mobileKeys.jump = false;
+  });
+}
+
+// Ne configurer les contrôles mobiles que si nécessaire
+if (isMobile) {
+  setupMobileControls();
+}
+
+// === FONCTIONS DU JEU ===
 
 function setCheckpoint() {
   checkpoint = {
@@ -259,12 +494,17 @@ function addScore(v) {
 function update() {
   if (paused || !level) return;
 
+  // === GESTION DES TOUCHES (clavier + mobile) ===
+  let left = keys['ArrowLeft'] || keys['a'] || mobileKeys.left;
+  let right = keys['ArrowRight'] || keys['d'] || mobileKeys.right;
+  let jump = keys[' '] || keys['ArrowUp'] || keys['w'] || mobileKeys.jump;
+
   player.vx = 0;
-  if (keys['ArrowLeft'] || keys['a']) player.vx = -player.speed;
-  if (keys['ArrowRight'] || keys['d']) player.vx = player.speed;
+  if (left) player.vx = -player.speed;
+  if (right) player.vx = player.speed;
   if (player.vx !== 0) player.facing = player.vx > 0 ? 1 : -1;
 
-  if ((keys[' '] || keys['ArrowUp'] || keys['w']) && player.onGround) {
+  if (jump && player.onGround) {
     player.vy = player.jumpForce;
     player.onGround = false;
   }
@@ -424,6 +664,7 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
+// === ÉVÉNEMENTS CLAVIER (toujours actifs) ===
 window.addEventListener('keydown', e => {
   keys[e.key] = true;
   if (e.key === 'p' || e.key === 'P') paused = !paused;
@@ -431,6 +672,7 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => keys[e.key] = false);
 
+// === BOUTON RECOMMENCER ===
 document.getElementById('restart').addEventListener('click', () => {
   lives = maxLives;
   score = 0;
@@ -440,6 +682,30 @@ document.getElementById('restart').addEventListener('click', () => {
   paused = false;
 });
 
+// === EMPÊCHER LE SCROLL SUR LES TOUCHES ===
+document.addEventListener('touchmove', (e) => {
+  if (e.target.closest('#controls, canvas')) e.preventDefault();
+}, { passive: false });
+
+// === DÉTECTION DES CHANGEMENTS D'ORIENTATION ===
+window.addEventListener('resize', () => {
+  const nowMobile = window.innerWidth <= 768;
+  const desktopControls = document.getElementById('desktop-controls');
+  const mobileControls = document.getElementById('mobile-controls');
+  const controls = document.getElementById('controls');
+  
+  if (nowMobile) {
+    desktopControls.style.display = 'none';
+    mobileControls.style.display = 'inline';
+    controls.style.display = 'flex';
+  } else {
+    desktopControls.style.display = 'inline';
+    mobileControls.style.display = 'none';
+    controls.style.display = 'none';
+  }
+});
+
+// === DÉMARRAGE ===
 updateLives();
 loadLevel(1);
 loop();
