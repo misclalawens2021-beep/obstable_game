@@ -124,6 +124,7 @@
     cursor: pointer;
     touch-action: manipulation;
   }
+  #info a.btn { display: inline-block; text-decoration: none; }
   #info .btn:hover { background: #ff6b81; }
   #info .btn:active { transform: scale(0.95); }
   

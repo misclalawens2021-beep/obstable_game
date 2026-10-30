@@ -239,6 +239,7 @@ function looseLife() {
 
 function gameOver() {
   paused = true;
+  saveRun();
   showMessage('💀 Game Over ! Score : ' + score, true);
   setTimeout(() => {
     lives = maxLives;
@@ -266,6 +267,15 @@ function showMessage(txt, big) {
 
 function rectsCollide(a, b) {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+}
+
+// === ENREGISTREMENT DES SCORES (lus par score.html) ===
+function saveRun() {
+  if (score <= 0) return;
+  let scores = [];
+  try { scores = JSON.parse(localStorage.getItem('platfScores') || '[]'); } catch (e) { scores = []; }
+  scores.push({ score: score, level: currentLevel, date: new Date().toISOString() });
+  try { localStorage.setItem('platfScores', JSON.stringify(scores)); } catch (e) {}
 }
 
 function addScore(v) {
@@ -457,6 +467,7 @@ window.addEventListener('keyup', e => keys[e.key] = false);
 
 // === BOUTON RECOMMENCER ===
 document.getElementById('restart').addEventListener('click', () => {
+  saveRun();
   lives = maxLives;
   score = 0;
   scoreEl.textContent = 0;
