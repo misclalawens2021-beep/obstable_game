@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scores - Jeu de Plateforme</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  main { width: 100%; max-width: 800px; }
+  h1 { text-align: center; margin-bottom: 16px; color: #ffd700; }
+  .stats { display: flex; gap: 10px; margin-bottom: 16px; }
+  .stat {
+    flex: 1; background: #16213e; border: 2px solid #e94560;
+    border-radius: 8px; padding: 12px; text-align: center;
+  }
+  .stat b { display: block; font-size: 24px; color: #ffd700; margin-top: 4px; }
+  .stat span { font-size: 13px; color: #aaa; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: #16213e; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px 12px; text-align: center; }
+  th { background: #e94560; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.04); }
+  tr.top td { color: #ffd700; font-weight: bold; }
+  .empty { text-align: center; color: #aaa; padding: 30px 10px; }
+  .actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  .btn {
+    background: #e94560; color: #fff; border: none; padding: 8px 16px;
+    border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none;
+    display: inline-block;
+  }
+  .btn:hover { background: #ff6b81; }
+  .btn.sec { background: #2d2d4e; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🏆 Scores</h1>
+
+  <div class="stats">
+    <div class="stat"><span>Meilleur score</span><b id="best">0</b></div>
+    <div class="stat"><span>Parties jouées</span><b id="count">0</b></div>
+    <div class="stat"><span>Score moyen</span><b id="avg">0</b></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Score</th><th>Niveau atteint</th><th>Date</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="empty" id="empty" style="display:none;">Aucun score enregistré pour le moment. Lancez une partie !</p>
+  </div>
+
+  <div class="actions">
+    <a class="btn" href="index.html">🎮 Jouer</a>
+    <button class="btn sec" id="clear">Effacer les scores</button>
+  </div>
+</main>
+
+<script>
+  const KEY = 'platfScores';
+
+  function load() {
+    try {
+      const data = JSON.parse(localStorage.getItem(KEY) || '[]');
+      return Array.isArray(data) ? data : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function render() {
+    const scores = load().sort((a, b) => b.score - a.score);
+    const rows = document.getElementById('rows');
+    rows.innerHTML = '';
+
+    document.getElementById('empty').style.display = scores.length ? 'none' : 'block';
+    document.getElementById('count').textContent = scores.length;
+    document.getElementById('best').textContent = scores.length ? scores[0].score : 0;
+    document.getElementById('avg').textContent = scores.length
+      ? Math.round(scores.reduce((t, s) => t + s.score, 0) / scores.length)
+      : 0;
+
+    scores.forEach((s, i) => {
+      const tr = document.createElement('tr');
+      if (i < 3) tr.className = 'top';
+      const medal = ['🥇', '🥈', '🥉'][i] || (i + 1);
+      const date = new Date(s.date).toLocaleString('fr-FR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      [medal, s.score, s.level, date].forEach(v => {
+        const td = document.createElement('td');
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      rows.appendChild(tr);
+    });
+  }
+
+  document.getElementById('clear').addEventListener('click', () => {
+    if (confirm('Effacer tous les scores enregistrés ?')) {
+      localStorage.removeItem(KEY);
+      render();
+    }
+  });
+
+  render();
+</script>
+</body>
+</html>
