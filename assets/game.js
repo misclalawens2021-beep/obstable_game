@@ -357,8 +357,128 @@ function update() {
   camX = Math.max(0, Math.min(player.x - W / 2 + player.w / 2, level.width - W));
 }
 
+// === FOND ANIMÉ STYLE ARCADE (parallaxe, étoiles, soleil rétro, ville néon, grille) ===
+const HORIZON = Math.floor(H * 0.68);
+
+const bgStars = Array.from({ length: 70 }, () => ({
+  x: Math.random() * W,
+  y: Math.random() * HORIZON * 0.9,
+  s: Math.random() < 0.2 ? 3 : 2,
+  ph: Math.random() * Math.PI * 2,
+  sp: 0.002 + Math.random() * 0.004
+}));
+
+const bgCity = [];
+let bgCityW = 0;
+(function buildCity() {
+  let cx = 0;
+  while (cx < W * 2) {
+    const w = 30 + Math.floor(Math.random() * 5) * 10;
+    const h = 40 + Math.floor(Math.random() * 12) * 10;
+    bgCity.push({ x: cx, w, h });
+    cx += w + 4;
+  }
+  bgCityW = cx;
+})();
+
+const bgCityCanvas = document.createElement('canvas');
+bgCityCanvas.width = bgCityW;
+bgCityCanvas.height = 160;
+(function renderCity() {
+  const c = bgCityCanvas.getContext('2d');
+  const base = 160;
+  for (const b of bgCity) {
+    c.fillStyle = '#14122b';
+    c.fillRect(b.x, base - b.h, b.w, b.h);
+    c.fillStyle = '#e94560';
+    c.fillRect(b.x, base - b.h, b.w, 2);
+    for (let j = 0; j < b.h - 10; j += 10) {
+      for (let i = 6; i < b.w - 6; i += 10) {
+        const k = (i * 7 + j * 13 + b.x) % 7;
+        if (k < 3) {
+          c.fillStyle = k === 0 ? 'rgba(79,195,247,0.9)' : 'rgba(255,215,0,0.55)';
+          c.fillRect(b.x + i, base - b.h + 8 + j, 4, 4);
+        }
+      }
+    }
+  }
+})();
+
+const bgSkyCanvas = document.createElement('canvas');
+bgSkyCanvas.width = W;
+bgSkyCanvas.height = HORIZON;
+(function renderSky() {
+  const c = bgSkyCanvas.getContext('2d');
+  const g = c.createLinearGradient(0, 0, 0, HORIZON);
+  g.addColorStop(0, '#0b0b1f');
+  g.addColorStop(0.6, '#2a1650');
+  g.addColorStop(1, '#8a2a5e');
+  c.fillStyle = g;
+  c.fillRect(0, 0, W, HORIZON);
+})();
+
+function drawBackground() {
+  const t = performance.now();
+
+  // Ciel dégradé (pré-rendu)
+  ctx.drawImage(bgSkyCanvas, 0, 0);
+
+  // Étoiles pixel qui scintillent
+  for (const s of bgStars) {
+    const sx = (((s.x - camX * 0.1) % W) + W) % W;
+    const a = 0.35 + 0.65 * Math.abs(Math.sin(t * s.sp + s.ph));
+    ctx.fillStyle = 'rgba(255,255,255,' + a.toFixed(2) + ')';
+    ctx.fillRect(Math.floor(sx), Math.floor(s.y), s.s, s.s);
+  }
+
+  // Soleil rétro à bandes
+  const sunX = W * 0.72 - camX * 0.03;
+  const sunY = HORIZON - 40;
+  const R = 75;
+  const sun = ctx.createLinearGradient(0, sunY - R, 0, sunY + R);
+  sun.addColorStop(0, '#ffe66d');
+  sun.addColorStop(1, '#ff2e63');
+  ctx.fillStyle = sun;
+  for (let dy = -R; dy < R; dy += 4) {
+    if (dy > 0 && Math.floor(dy / 4) % Math.max(2, 6 - Math.floor(dy / 16)) === 0) continue;
+    const half = Math.sqrt(R * R - dy * dy);
+    ctx.fillRect(sunX - half, sunY + dy, half * 2, 4);
+  }
+
+  // Ville néon en parallaxe (pré-rendue)
+  const off = Math.floor((camX * 0.3) % bgCityW);
+  ctx.drawImage(bgCityCanvas, -off, HORIZON - 160);
+  ctx.drawImage(bgCityCanvas, bgCityW - off, HORIZON - 160);
+
+  // Sol : grille néon en perspective qui défile
+  ctx.fillStyle = '#0d0a22';
+  ctx.fillRect(0, HORIZON, W, H - HORIZON);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(233,69,96,0.45)';
+  const gOff = (camX * 0.5) % 60;
+  ctx.beginPath();
+  for (let i = -14; i <= 14; i++) {
+    const gx = i * 60 - gOff;
+    ctx.moveTo(W / 2 + gx * 0.15, HORIZON);
+    ctx.lineTo(W / 2 + gx * 1.8, H);
+  }
+  const scroll = (t * 0.0004) % 1;
+  for (let i = 0; i < 9; i++) {
+    const p = (i + scroll) / 9;
+    const y = HORIZON + (H - HORIZON) * p * p;
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+  }
+  ctx.stroke();
+
+  // Ligne d'horizon lumineuse
+  ctx.fillStyle = 'rgba(79,195,247,0.8)';
+  ctx.fillRect(0, HORIZON, W, 2);
+}
+
 function draw() {
   ctx.clearRect(0, 0, W, H);
+  drawBackground();
   if (!level) return;
 
   ctx.save();
@@ -451,8 +571,17 @@ function draw() {
   ctx.restore();
 }
 
-function loop() {
-  update();
+const STEP = 1000 / 60;
+let lastT = performance.now();
+let acc = 0;
+function loop(now) {
+  now = now || performance.now();
+  acc += Math.min(now - lastT, 100);
+  lastT = now;
+  while (acc >= STEP) {
+    update();
+    acc -= STEP;
+  }
   draw();
   requestAnimationFrame(loop);
 }
@@ -502,4 +631,4 @@ window.addEventListener('resize', () => {
 // === DÉMARRAGE ===
 updateLives();
 loadLevel(1);
-loop();
+requestAnimationFrame(loop);

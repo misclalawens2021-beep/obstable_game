@@ -173,3 +173,47 @@
     #mode-indicator .pc-mode { display: none; }
     #mode-indicator .mobile-mode { display: inline; }
   }
+
+  /* === FOND ARCADE ANIMÉ (page) === */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(rgba(233,69,96,.18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,195,247,.14) 1px, transparent 1px),
+      radial-gradient(ellipse at 50% 0%, #2a1650 0%, #1a1a2e 60%, #0b0b1f 100%);
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+    animation: gridScroll 4s linear infinite;
+  }
+  @keyframes gridScroll {
+    from { background-position: 0 0, 0 0, 0 0; }
+    to   { background-position: 0 40px, 40px 0, 0 0; }
+  }
+  /* Effet écran CRT : lignes de balayage + léger scintillement */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+      rgba(0,0,0,.14) 3px, rgba(0,0,0,0) 4px
+    );
+    animation: crtFlicker 0.15s infinite;
+  }
+  @keyframes crtFlicker {
+    0%   { opacity: .85; }
+    50%  { opacity: 1; }
+    100% { opacity: .9; }
+  }
+  /* Halo néon autour du jeu */
+  canvas {
+    box-shadow: 0 0 12px rgba(233,69,96,.7), 0 0 36px rgba(79,195,247,.35);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body::before, body::after { animation: none; }
+  }
