@@ -151,7 +151,8 @@ function makeLevel(n) {
   }
 
   const last = platforms[platforms.length - 1];
-  const finish = { x: last.x + last.w, y: last.y - 90, w: 56, h: 90 };
+  last.w += 90; // plateforme d'arrivée plus large pour pouvoir s'y poser
+  const finish = { x: last.x + last.w - 56 - 20, y: last.y - 90, w: 56, h: 90 };
 
   const coins = [];
   platforms.slice(1, -1).forEach(a => {
@@ -164,7 +165,7 @@ function makeLevel(n) {
 
   const traps = [];
   if (n >= 2) {
-    const spikeSurfaces = platforms.filter((a, i) => i > 0 && i % 2 === 0 && n >= 2);
+    const spikeSurfaces = platforms.filter((a, i) => i > 0 && i < platforms.length - 1 && i % 2 === 0 && n >= 2);
     for (let i = 0; i < Math.min(spikeSurfaces.length, 2 + n); i++) {
       const plat = spikeSurfaces[i];
       if (plat) traps.push({ x: plat.x + plat.w / 2 - 25, y: plat.y - 14, w: 50, h: 14 });
@@ -172,7 +173,7 @@ function makeLevel(n) {
   }
 
   const enemies = [];
-  const patrolPlats = platforms.slice(1);
+  const patrolPlats = platforms.slice(1, -1);
   for (let i = 0; i < Math.min(2 + n, patrolPlats.length); i++) {
     const plat = patrolPlats[Math.floor((i * 3 + 1) % patrolPlats.length)];
     enemies.push({
@@ -292,6 +293,8 @@ function update() {
   let right = keys['ArrowRight'] || keys['d'] || mobileKeys.right;
   let jump = keys[' '] || keys['ArrowUp'] || keys['w'] || mobileKeys.jump;
 
+  if (finished) { left = right = jump = false; } // niveau terminé : on ne bouge plus
+
   player.vx = 0;
   if (left) player.vx = -player.speed;
   if (right) player.vx = player.speed;
@@ -327,17 +330,17 @@ function update() {
     }
   }
 
-  if (player.y > H) looseLife();
+  if (player.y > H && !finished) looseLife();
 
   for (const e of level.enemies) {
     e.x += e.dir * e.speed;
     if (e.x < e.minX) { e.x = e.minX; e.dir = 1; }
     if (e.x + e.w > e.maxX) { e.x = e.maxX - e.w; e.dir = -1; }
-    if (rectsCollide(player, e)) looseLife();
+    if (!finished && rectsCollide(player, e)) looseLife();
   }
 
   for (const t of level.traps) {
-    if (rectsCollide(player, t)) looseLife();
+    if (!finished && rectsCollide(player, t)) looseLife();
   }
 
   for (const c of level.coins) {
